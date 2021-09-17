@@ -66,7 +66,13 @@
       line: "pm.min_spare_servers = {{ php_fpm_pm_min_spare_servers }}"
     - regexp: '^pm\.max_spare_servers.?=.+$'
       line: "pm.max_spare_servers = {{ php_fpm_pm_max_spare_servers }}"
-  when: php_enable_php_fpm
+    - regexp: ';?pm\.status_path.?=.+$'
+      line: "pm.status_path = {{ php_fpm_pm_status_path | default(omit) }}"
+      when: "{{ php_fpm_pm_status_path is defined }}"
+    - regexp: ';?ping\.path.?=.+$'
+      line: "ping.path = {{ php_fpm_ping_path | default(omit) }}"
+      when: "{{ php_fpm_ping_path is defined }}"
+  when: php_enable_php_fpm and item.when | default(true)
   notify: restart php-fpm
 
 - name: Configure php-fpm pool environment variables (if enabled).
