@@ -33,15 +33,17 @@
     mode: 0755
   when: php_fpm_pool_conf_path_dir_stat.stat.islnk is not defined
 
-- name: Ensure the default pool exists.
+- name: Create fpm pools.
   template:
-    src: www.conf.j2
-    dest: "{{ php_fpm_pool_conf_path }}"
+    src: "{{ item.pool_template | default('www.conf.j2', true) }}"
+    dest: "{{ php_fpm_pool_conf_path | dirname }}/{{ item.pool_name }}.conf"
     owner: root
     group: root
     mode: 0644
-    force: false
+    force: true
+  loop: "{{ php_fpm_pools | default([], true) }}"
   when: php_enable_php_fpm
+  notify: restart php-fpm
 
 - name: Configure php-fpm pool (if enabled).
   lineinfile:
