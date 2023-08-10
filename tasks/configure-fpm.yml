@@ -40,50 +40,7 @@
     owner: root
     group: root
     mode: 0644
-    force: true
   loop: "{{ php_fpm_pools | default([], true) }}"
-  when: php_enable_php_fpm
-  notify: restart php-fpm
-
-- name: Configure php-fpm pool (if enabled).
-  lineinfile:
-    dest: "{{ php_fpm_pool_conf_path }}"
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-    state: present
-  with_items:
-    - regexp: "^user.?=.+$"
-      line: "user = {{ php_fpm_pool_user }}"
-    - regexp: "^group.?=.+$"
-      line: "group = {{ php_fpm_pool_group }}"
-    - regexp: "^listen.?=.+$"
-      line: "listen = {{ php_fpm_listen }}"
-    - regexp: '^listen\.allowed_clients.?=.+$'
-      line: "listen.allowed_clients = {{ php_fpm_listen_allowed_clients }}"
-    - regexp: '^pm\.max_children.?=.+$'
-      line: "pm.max_children = {{ php_fpm_pm_max_children }}"
-    - regexp: '^pm\.start_servers.?=.+$'
-      line: "pm.start_servers = {{ php_fpm_pm_start_servers }}"
-    - regexp: '^pm\.min_spare_servers.?=.+$'
-      line: "pm.min_spare_servers = {{ php_fpm_pm_min_spare_servers }}"
-    - regexp: '^pm\.max_spare_servers.?=.+$'
-      line: "pm.max_spare_servers = {{ php_fpm_pm_max_spare_servers }}"
-    - regexp: ';?pm\.status_path.?=.+$'
-      line: "pm.status_path = {{ php_fpm_pm_status_path | default(omit) }}"
-      when: "{{ php_fpm_pm_status_path is defined }}"
-    - regexp: ';?ping\.path.?=.+$'
-      line: "ping.path = {{ php_fpm_ping_path | default(omit) }}"
-      when: "{{ php_fpm_ping_path is defined }}"
-  when: php_enable_php_fpm and item.when | default(true)
-  notify: restart php-fpm
-
-- name: Configure php-fpm pool environment variables (if enabled).
-  lineinfile:
-    dest: "{{ php_fpm_pool_conf_path }}"
-    regexp: "^env\\[{{ item.key }}\\].?=.+$"
-    line: "env[{{ item.key }}] = {{ item.value }}"
-    state: present
-  with_dict: "{{ php_fpm_env | default({}) }}"
   when: php_enable_php_fpm
   notify: restart php-fpm
 

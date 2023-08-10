@@ -3,11 +3,11 @@
 [{{ item.pool_name | mandatory }}]
 listen = {{ item.pool_listen | mandatory }}
 listen.allowed_clients = {{ item.pool_listen_allowed_clients | default('127.0.0.1', true) }}
-user = {{ php_fpm_pool_user }}
-group = {{ php_fpm_pool_group }}
+listen.owner = {{ item.pool_listen_owner | default(item.pool_user | default(php_fpm_pool_user)) }}
+listen.group = {{ item.pool_listen_group | default(item.pool_group | default(php_fpm_pool_group)) }}
 
-listen.owner = {{ php_fpm_pool_user }}
-listen.group = {{ php_fpm_pool_group }}
+user = {{ item.pool_user | default(php_fpm_pool_user) }}
+group = {{ item.pool_group | default(php_fpm_pool_group) }}
 
 pm = {{ item.pool_pm | default('dynamic', true) }}
 pm.max_children = {{ item.pool_pm_max_children | default(50, true) }}
@@ -15,3 +15,13 @@ pm.start_servers = {{ item.pool_pm_start_servers | default(5, true) }}
 pm.min_spare_servers = {{ item.pool_pm_min_spare_servers | default(5, true) }}
 pm.max_spare_servers = {{ item.pool_pm_max_spare_servers | default(5, true) }}
 pm.max_requests = {{ item.pool_pm_max_requests | default(500, true) }}
+{% if item.pool_pm_status_path | default(php_fpm_pm_status_path | default(false)    ) -%}
+pm.status_path = {{ item.pool_pm_status_path | default(php_fpm_pm_status_path) }}
+{%- endif %}
+{% if item.pool_pm_ping_path | default(php_fpm_pm_ping_path | default(false)) -%}
+ping.path = {{ item.pool_pm_ping_path | default(php_fpm_pm_ping_path) }}
+{%- endif %}
+
+{% for key, value in (item.pool_env | default(php_fpm_env)).items() %}
+env[{{ key }}] = {{ value }}
+{% endfor %}
