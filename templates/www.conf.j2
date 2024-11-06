@@ -15,12 +15,12 @@ pm.start_servers = {{ item.pool_pm_start_servers | default(5, true) }}
 pm.min_spare_servers = {{ item.pool_pm_min_spare_servers | default(5, true) }}
 pm.max_spare_servers = {{ item.pool_pm_max_spare_servers | default(5, true) }}
 pm.max_requests = {{ item.pool_pm_max_requests | default(500, true) }}
-{% if item.pool_pm_status_path | default(php_fpm_pm_status_path | default(false)    ) -%}
+{% if item.pool_pm_status_path | default(php_fpm_pm_status_path | default(false)) %}
 pm.status_path = {{ item.pool_pm_status_path | default(php_fpm_pm_status_path) }}
-{%- endif %}
-{% if item.pool_pm_ping_path | default(php_fpm_pm_ping_path | default(false)) -%}
+{% endif %}
+{% if item.pool_pm_ping_path | default(php_fpm_pm_ping_path | default(false)) %}
 ping.path = {{ item.pool_pm_ping_path | default(php_fpm_pm_ping_path) }}
-{%- endif %}
+{% endif %}
 
 {% for key, value in (item.pool_env | default(php_fpm_env)).items() %}
 env[{{ key }}] = {{ value }}
